@@ -159,14 +159,21 @@ footer {visibility: hidden;}
 """, unsafe_allow_html=True)
 
 # -------------------- MODEL LOADING ------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "waste_random_forest.pkl")
+import os
+import requests
+import joblib
 
-@st.cache_resource
-def load_model(path):
-    if not os.path.isfile(path):
-        return None
-    return joblib.load(path)
+MODEL_PATH = "waste_random_forest.pkl"
+MODEL_URL = "https://github.com/msdalal13/waste_classification_ml/releases/download/v1.0/waste_random_forest.pkl"
+
+if not os.path.exists(MODEL_PATH):
+    response = requests.get(MODEL_URL)
+    response.raise_for_status()
+
+    with open(MODEL_PATH, "wb") as f:
+        f.write(response.content)
+
+model = joblib.load(MODEL_PATH)
 
 # -------------------- FEATURE EXTRACTION -------------------
 # Must remain identical to the improved Random Forest notebook.
